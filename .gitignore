@@ -1,0 +1,10 @@
+# Local environment / secrets
+.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Deployment internals
+.opencode-server/

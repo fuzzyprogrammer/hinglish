@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- English Root -->
+  <url>
+    <loc>https://hinglish.openpixal.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hinglish.openpixal.com/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- English Tools -->
+  <url>
+    <loc>https://hinglish.openpixal.com/hinglish-to-hindi/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/hinglish-to-hindi/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hinglish-se-hindi/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hinglish-to-english/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/hinglish-to-english/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hinglish-se-english/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/english-to-hinglish/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/english-to-hinglish/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/english-se-hinglish/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hindi-to-hinglish/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/hindi-to-hinglish/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hindi-se-hinglish/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hinglish-caption-generator/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/hinglish-caption-generator/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hinglish-caption-generator/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- English Search-Intent Landings -->
+  <url>
+    <loc>https://hinglish.openpixal.com/translate-english-to-hinglish/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/translate-english-to-hinglish/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/english-se-hinglish-translate/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hinglish-to-hindi-translate/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/hinglish-to-hindi-translate/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hinglish-se-hindi-translate/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- English Content & Info -->
+  <url>
+    <loc>https://hinglish.openpixal.com/what-is-hinglish/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/what-is-hinglish/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hinglish-kya-hai/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hinglish-typing/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/hinglish-typing/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/hinglish-typing/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/faq/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/faq/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/faq/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/about/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/about/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/privacy-policy/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/terms/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Hindi Root -->
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hinglish.openpixal.com/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://hinglish.openpixal.com/hi/"/>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hindi Tools -->
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hinglish-se-hindi/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hinglish-se-english/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/english-se-hinglish/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hindi-se-hinglish/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hinglish-caption-generator/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/english-se-hinglish-translate/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hinglish-se-hindi-translate/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hinglish-kya-hai/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/hinglish-typing/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/faq/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/about/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/privacy-policy/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://hinglish.openpixal.com/hi/terms/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+</urlset>
