@@ -160,79 +160,81 @@
         showToast(numbersOn ? "Devanagari numbers" : "Normal numbers");
       });
 
-      /* Voice typing — uses system built-in speech recognition (Windows/Mac/Mobile) */
-      function checkMicPermission() {
-        return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
-      }
-      if (tbVoice) {
-        /* Pre-check: show button state based on support */
-        if (!checkMicPermission()) {
+      /* Voice typing — uses browser built-in speech recognition (Chrome/Edge/Safari) */
+      var voiceSupported = false;
+      (function detectVoiceSupport() {
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        var hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        voiceSupported = !!SR && hasGetUserMedia;
+        if (!voiceSupported && tbVoice) {
           tbVoice.disabled = true;
-          tbVoice.title = "Voice typing needs a modern browser with microphone support";
+          tbVoice.title = "Voice needs Chrome, Edge or Safari with microphone access";
           tbVoice.style.opacity = "0.4";
         }
-      }
+      })();
       if (tbVoice) tbVoice.addEventListener("click", function () {
-        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) {
-          showToast("Voice typing needs Chrome or Edge browser");
+        if (!voiceSupported) {
+          showToast("Voice not available in this browser");
           return;
         }
-        if (!navigator.onLine) {
-          showToast("Voice typing needs internet — connect and try again");
-          return;
-        }
+        /* Stop if already recording */
         if (voiceActive) {
           if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
           voiceActive = false;
           tbVoice.classList.remove("active");
-          tbVoice.innerHTML = "&#x1F3A4; Speak";
           showToast("Mic stopped");
           return;
         }
-        try {
-          recognition = new SR();
-          recognition.lang = hinglishMode ? "hi-IN" : "en-US";
-          recognition.continuous = false;
-          recognition.interimResults = true;
-          recognition.maxAlternatives = 1;
-          recognition.onstart = function () {
-            voiceActive = true;
-            tbVoice.classList.add("active");
-            tbVoice.innerHTML = "&#x1F3A4; Listening...";
-            showToast("Speak now — your device mic is active");
-          };
-          recognition.onresult = function (e) {
-            var finalText = "";
-            for (var i = e.resultIndex; i < e.results.length; i++) {
-              if (e.results[i].isFinal) {
-                finalText += e.results[i][0].transcript;
-              }
+        /* Request mic permission first — if denied, show clear message */
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(function (stream) {
+            /* Mic permission granted — stop the stream, start speech recognition */
+            stream.getTracks().forEach(function (t) { t.stop(); });
+            try {
+              var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+              recognition = new SR();
+              recognition.lang = hinglishMode ? "hi-IN" : "en-US";
+              recognition.continuous = false;
+              recognition.interimResults = true;
+              recognition.maxAlternatives = 1;
+              recognition.onstart = function () {
+                voiceActive = true;
+                tbVoice.classList.add("active");
+                showToast("Speak now...");
+              };
+              recognition.onresult = function (e) {
+                var finalText = "";
+                for (var i = e.resultIndex; i < e.results.length; i++) {
+                  if (e.results[i].isFinal) {
+                    finalText += e.results[i][0].transcript;
+                  }
+                }
+                if (finalText) {
+                  inArea.value += (inArea.value && !/\s$/.test(inArea.value) ? " " : "") + finalText;
+                  inArea.dispatchEvent(new Event("input"));
+                }
+              };
+              recognition.onerror = function (e) {
+                if (e.error === "no-speech") { showToast("No speech detected — try again"); }
+                else if (e.error === "not-allowed") { showToast("Mic blocked — check browser settings"); }
+                else if (e.error === "network") { showToast("Offline — voice needs internet"); }
+                else if (e.error === "aborted") { /* user cancelled */ }
+                else { showToast("Voice error: " + e.error); }
+                voiceActive = false;
+                tbVoice.classList.remove("active");
+              };
+              recognition.onend = function () {
+                voiceActive = false;
+                tbVoice.classList.remove("active");
+              };
+              recognition.start();
+            } catch (err) {
+              showToast("Could not start voice");
             }
-            if (finalText) {
-              inArea.value += (inArea.value && !/\s$/.test(inArea.value) ? " " : "") + finalText;
-              inArea.dispatchEvent(new Event("input"));
-            }
-          };
-          recognition.onerror = function (e) {
-            if (e.error === "no-speech") { showToast("No speech detected — try again"); }
-            else if (e.error === "not-allowed") { showToast("Microphone access denied — allow mic in browser settings"); }
-            else if (e.error === "network") { showToast("Voice processing needs internet — connect and retry"); }
-            else if (e.error === "aborted") { /* user cancelled — no message needed */ }
-            else { showToast("Voice error: " + e.error); }
-            voiceActive = false;
-            tbVoice.classList.remove("active");
-            tbVoice.innerHTML = "&#x1F3A4; Speak";
-          };
-          recognition.onend = function () {
-            voiceActive = false;
-            tbVoice.classList.remove("active");
-            tbVoice.innerHTML = "&#x1F3A4; Speak";
-          };
-          recognition.start();
-        } catch (e) {
-          showToast("Could not start speech recognition");
-        }
+          })
+          .catch(function () {
+            showToast("Mic access denied — allow mic in browser settings");
+          });
       });
 
       /* Emoji picker */
