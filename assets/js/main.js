@@ -126,39 +126,17 @@
       var toolbar = document.createElement("div");
       toolbar.className = "tool-toolbar";
       toolbar.innerHTML =
-        '<button class="tb-btn" data-tb-action="voice" title="Use your device microphone to speak Hindi">&#x1F3A4; Speak</button>' +
-        '<span class="tb-sep"></span>' +
-        '<button class="tb-btn" data-tb-toggle="fullstop" title="Toggle . to 1 (Purn Viram)">&#x0964;</button>' +
-        '<button class="tb-btn" data-tb-toggle="numbers" title="Toggle 123 to Devanagari numbers">&#x0967;&#x0968;&#x0969;</button>' +
-        '<span class="tb-sep"></span>' +
-        '<button class="tb-btn" data-tb-action="emoji" title="Insert emoji">&#x1F60A;</button>' +
+        '<button class="tb-btn" data-tb-action="voice" title="Speak to type — uses your device microphone">&#x1F3A4; Speak</button>' +
+        '<button class="tb-btn" data-tb-action="emoji" title="Insert emoji">&#x1F60A; Emoji</button>' +
         '<button class="tb-btn" data-tb-action="keyboard" title="On-screen Devanagari keyboard">&#x2328; Keyboard</button>';
       w.insertBefore(toolbar, w.querySelector(".scope-row"));
 
-      var tbFullstop = toolbar.querySelector("[data-tb-toggle='fullstop']");
-      var tbNumbers = toolbar.querySelector("[data-tb-toggle='numbers']");
+      var tbKeyboard = toolbar.querySelector("[data-tb-action='keyboard']");
       var tbVoice = toolbar.querySelector("[data-tb-action='voice']");
       var tbEmoji = toolbar.querySelector("[data-tb-action='emoji']");
-      var tbKeyboard = toolbar.querySelector("[data-tb-action='keyboard']");
 
-      var fullstopOn = false;
-      var numbersOn = false;
       var voiceActive = false;
       var recognition = null;
-
-      /* Full-stop toggle */
-      if (tbFullstop) tbFullstop.addEventListener("click", function () {
-        fullstopOn = !fullstopOn;
-        tbFullstop.classList.toggle("active", fullstopOn);
-        showToast(fullstopOn ? "Purn Viram ON" : "Purn Viram OFF");
-      });
-
-      /* Number toggle */
-      if (tbNumbers) tbNumbers.addEventListener("click", function () {
-        numbersOn = !numbersOn;
-        tbNumbers.classList.toggle("active", numbersOn);
-        showToast(numbersOn ? "Devanagari numbers" : "Normal numbers");
-      });
 
       /* Voice typing — uses browser built-in speech recognition (Chrome/Edge/Safari) */
       var voiceSupported = false;
