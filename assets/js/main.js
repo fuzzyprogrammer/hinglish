@@ -161,10 +161,25 @@
       });
 
       /* Voice typing — uses system built-in speech recognition (Windows/Mac/Mobile) */
+      function checkMicPermission() {
+        return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+      }
+      if (tbVoice) {
+        /* Pre-check: show button state based on support */
+        if (!checkMicPermission()) {
+          tbVoice.disabled = true;
+          tbVoice.title = "Voice typing needs a modern browser with microphone support";
+          tbVoice.style.opacity = "0.4";
+        }
+      }
       if (tbVoice) tbVoice.addEventListener("click", function () {
         var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) {
-          showToast("Speech not supported — try Chrome or Edge browser");
+          showToast("Voice typing needs Chrome or Edge browser");
+          return;
+        }
+        if (!navigator.onLine) {
+          showToast("Voice typing needs internet — connect and try again");
           return;
         }
         if (voiceActive) {
@@ -201,9 +216,10 @@
           };
           recognition.onerror = function (e) {
             if (e.error === "no-speech") { showToast("No speech detected — try again"); }
-            else if (e.error === "not-allowed") { showToast("Mic access denied — allow mic in browser settings"); }
-            else if (e.error === "network") { showToast("Speech requires internet connection"); }
-            else if (e.error !== "aborted") { showToast("Speech error: " + e.error); }
+            else if (e.error === "not-allowed") { showToast("Microphone access denied — allow mic in browser settings"); }
+            else if (e.error === "network") { showToast("Voice processing needs internet — connect and retry"); }
+            else if (e.error === "aborted") { /* user cancelled — no message needed */ }
+            else { showToast("Voice error: " + e.error); }
             voiceActive = false;
             tbVoice.classList.remove("active");
             tbVoice.innerHTML = "&#x1F3A4; Speak";
