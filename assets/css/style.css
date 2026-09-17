@@ -476,6 +476,32 @@ p { margin: 0 0 1em; max-width: var(--measure); }
 .deva-keyboard .kb-key:hover { background: var(--navy-soft); color: var(--navy); border-color: var(--navy); }
 .deva-keyboard .kb-key--wide { min-width: 60px; font-size: 0.78rem; font-weight: 700; }
 
+/* ---------- Emoji Popup ---------- */
+.emoji-popup {
+  position: absolute; z-index: 200; top: 100%; left: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-m);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22); width: 320px; max-height: 320px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.emoji-popup .emoji-tabs {
+  display: flex; gap: 2px; padding: 6px; border-bottom: 1px solid var(--line-soft); overflow-x: auto;
+}
+.emoji-popup .emoji-tab {
+  border: 0; background: transparent; color: var(--ink-soft); font-size: 0.75rem; font-weight: 600;
+  padding: 5px 10px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+  font-family: var(--font-body); transition: all 0.12s;
+}
+.emoji-popup .emoji-tab:hover { background: var(--surface-soft); }
+.emoji-popup .emoji-tab.active { background: var(--navy); color: #fff; }
+.emoji-popup .emoji-grid {
+  display: flex; flex-wrap: wrap; gap: 2px; padding: 8px; overflow-y: auto; max-height: 260px;
+}
+.emoji-popup .emoji-btn {
+  border: 0; background: transparent; font-size: 1.4rem; padding: 5px 6px; border-radius: 6px;
+  cursor: pointer; line-height: 1.2; transition: background 0.1s;
+}
+.emoji-popup .emoji-btn:hover { background: var(--surface-soft); }
+
 /* ---------- Mobile responsive for new features ---------- */
 @media (max-width: 600px) {
   .tool-toolbar { gap: 4px; padding: 6px 8px; }

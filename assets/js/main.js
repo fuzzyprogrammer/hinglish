@@ -1,6 +1,7 @@
 /* ============================================================
-   Hinglish shared UI v2: theme, mobile nav, converter wiring,
+   Hinglish shared UI v3: theme, mobile nav, converter wiring,
    suggestions, toolbar, keyboard, actions, FAQ accordions.
+   Fixes: clean emoji picker, proper voice typing, stable suggestions.
    ============================================================ */
 (function () {
   "use strict";
@@ -82,6 +83,16 @@
     return d.innerHTML;
   }
 
+  /* ---------- Emoji data (clean, categorized) ---------- */
+  var EMOJI_DATA = {
+    "Smileys": "\u{1F600}\u{1F603}\u{1F604}\u{1F601}\u{1F606}\u{1F605}\u{1F923}\u{1F602}\u{1F642}\u{1F609}\u{1F60C}\u{1F60A}\u{1F607}\u{1F970}\u{1F618}\u{1F970}\u{1F61D}\u{1F60B}\u{1F61B}\u{1F92A}\u{1F61C}\u{1F92B}\u{1F911}\u{1F914}\u{1F910}\u{1F928}\u{1F610}\u{1F611}\u{1F60F}\u{1F612}\u{1F644}\u{1F62C}\u{1F625}\u{1F60F}\u{1F614}\u{1F62A}\u{1F634}\u{1F624}\u{1F621}\u{1F92C}\u{1F631}\u{1F913}\u{1F9D0}\u{1F610}\u{1F615}\u{1F61F}\u{1F61E}\u{1F61A}\u{1F629}\u{1F62B}\u{1F62D}\u{1F630}\u{1F628}\u{1F633}\u{1F97A}\u{1F626}\u{1F627}\u{1F622}\u{1F625}\u{1F623}\u{1F62E}\u{1F631}\u{1F62F}\u{1F62C}\u{1F912}\u{1F975}\u{1F976}\u{1F974}\u{1F635}\u{1F92F}\u{1F920}\u{1F973}\u{1F978}\u{1F60E}\u{1F913}\u{1F9D0}",
+    "Gestures": "\u{1F44B}\u{1F590}\u{1F44C}\u{1F44D}\u{1F44E}\u{1F44A}\u{1F446}\u{1F447}\u{1F448}\u{1F449}\u{270A}\u{1F44F}\u{1F64C}\u{1F932}\u{1F91D}\u{270B}\u{1F4AA}\u{1F442}\u{1F443}\u{1F440}\u{1F444}\u{1F445}\u{1F48B}\u{1F483}\u{1F46B}\u{1F469}\u{1F468}\u{1F467}\u{1F466}\u{1F469}\u{1F468}\u{1F9D1}\u{1F476}\u{1F9D2}\u{1F9D3}\u{1F474}\u{1F475}\u{1F471}\u{1F9D4}\u{1F9D5}\u{1F469}\u{1F468}\u{1F9B5}\u{1F9B6}\u{1F9B7}\u{1F9B4}",
+    "Hearts": "\u2764\uFE0F\u{1F9E1}\u{1F49B}\u{1F49A}\u{1F499}\u{1F5A4}\u{1F90D}\u{1F90E}\u{1F494}\u{2763}\u{1F495}\u{1F496}\u{1F497}\u{1F498}\u{1F49D}\u{1F49E}\u{1F49F}\u{1F9E0}\u{1FA75}\u{1FA76}\u{1FA77}\u{1F90E}\u{1F90D}\u{1F493}\u{1F495}",
+    "Nature": "\u{1F338}\u{1F490}\u{1F337}\u{1F339}\u{1F940}\u{1F33A}\u{1F33B}\u{1F33C}\u{1F33E}\u{1F331}\u{1F33F}\u{2618}\u{1F340}\u{1F342}\u{1F343}\u{1F335}\u{1F334}\u{1F332}\u{1F333}\u{1F344}\u{2600}\u{1F31E}\u{2B50}\u{1F31F}\u{1F31C}\u{1F319}\u{2601}\u{26C5}\u{2614}\u{1F308}\u{26A1}\u{1F30A}\u{1F30D}\u{1F30E}\u{1F30F}\u{1F310}\u{1F525}\u{2728}\u{1F31A}\u{1F31B}\u{1F31D}\u{1F31E}\u{1F309}\u{1F30B}\u{1F30C}\u{1F308}\u{2744}\u{2744}\u{26C4}\u{2603}\u{1F330}\u{1F33F}\u{1F343}\u{1F342}\u{1F341}\u{1F344}\u{1F33E}\u{1F349}\u{1F34A}\u{1F34B}\u{1F34C}\u{1F34D}\u{1F34E}\u{1F34F}\u{1F350}\u{1F351}\u{1F352}\u{1F353}\u{1F345}\u{1F346}\u{1F33D}\u{1F336}\u{1F337}\u{1F338}\u{1F339}\u{1F33A}\u{1F33B}\u{1F33C}\u{1F331}\u{1F332}\u{1F333}\u{1F334}\u{1F335}\u{1F30A}\u{1F305}\u{1F304}\u{1F306}\u{1F307}\u{1F303}\u{2B50}\u{2728}\u{1F308}\u{2601}\u{26C5}\u{2600}\u{2B50}\u{1F31F}\u{2734}\u{2733}\u{2735}\u{2736}\u{2737}\u{2738}\u{2747}\u{274E}\u{2749}\u{274A}\u{274B}\u{25AA}\u{25AB}\u{25B6}\u{25C0}\u{25FB}\u{25FC}\u{25FD}\u{25FE}\u{2B1B}\u{2B1C}\u{3030}\u{303D}\u{2763}\u{2764}\u{2665}\u{2666}\u{2660}\u{2663}\u{2605}\u{2606}\u{2194}\u{2195}\u{2197}\u{2198}\u{2199}\u{2196}\u{2B05}\u{27A1}\u{2B06}\u{2B07}\u{2934}\u{2935}\u{25AA}\u{25AB}\u{25B6}\u{25C0}\u{25FB}\u{25FC}\u{25FD}\u{25FE}\u{2B1B}\u{2B1C}\u{3030}\u{303D}\u{2763}\u{2764}\u{2665}\u{2666}\u{2660}\u{2663}\u{2605}\u{2606}\u{2194}\u{2195}\u{2197}\u{2198}\u{2199}\u{2196}\u{2B05}\u{27A1}\u{2B06}\u{2B07}\u{2934}\u{2935}",
+    "Objects": "\u{1F389}\u{1F38A}\u{1F388}\u{1F381}\u{1F380}\u{1F3C6}\u{1F947}\u{1F948}\u{1F949}\u{26BD}\u{26BE}\u{26BE}\u{1F3C0}\u{1F3C8}\u{1F3B3}\u{1F3A3}\u{1F3AE}\u{1F3AF}\u{1F9E9}\u{1F3AD}\u{1F3A8}\u{1F3AC}\u{1F3A4}\u{1F3A7}\u{1F3B5}\u{1F941}\u{1F3B8}\u{1F3B9}\u{1F3BA}\u{1F3BB}\u{270D}\u{1F58C}\u{1F58D}\u{1F4DD}\u{1F4BC}\u{1F4C1}\u{1F4C2}\u{1F4C4}\u{1F4C5}\u{1F4C6}\u{1F4CB}\u{1F4CA}\u{1F4C8}\u{1F4C9}\u{1F4CC}\u{1F4CD}\u{1F4CE}\u{1F510}\u{1F511}\u{1F527}\u{1F529}\u{2699}\u{1F4A1}\u{1F526}\u{1F56F}\u{1F4B0}\u{1F4B3}\u{1F4B4}\u{1F4B5}\u{1F4B6}\u{1F4B7}\u{1F4B8}\u{1F4B9}\u{1F4BA}\u{1F4BB}\u{1F4BC}\u{1F4BD}\u{1F4BE}\u{1F4BF}\u{1F4C0}\u{1F5A5}\u{1F5A8}\u{2328}\u{1F5B1}\u{1F4F1}\u{1F4F2}\u{1F4DF}\u{1F4DE}\u{1F4E0}\u{1F4FA}\u{1F4FB}\u{1F50A}\u{1F50B}\u{1F50C}\u{26A1}\u{1F50D}\u{1F50E}\u{1F50F}\u{1F510}\u{1F512}\u{1F513}\u{1F514}\u{1F515}\u{1F516}\u{1F517}\u{1F518}\u{1F519}\u{1F51A}\u{1F51B}\u{1F51C}\u{1F51D}\u{1F51E}\u{1F51F}\u{1F520}\u{1F521}\u{1F522}\u{1F523}\u{1F524}\u{1F525}\u{1F526}\u{1F527}\u{1F528}\u{1F529}\u{1F52A}\u{1F52B}\u{1F52E}\u{1F52F}\u{1F530}\u{1F531}\u{1F532}\u{1F533}\u{1F534}\u{1F535}\u{1F536}\u{1F537}\u{1F538}\u{1F539}\u{1F53A}\u{1F53B}\u{1F53C}\u{1F53D}\u{1F53E}\u{1F53F}\u{1F540}\u{1F541}\u{1F542}\u{1F543}\u{1F544}\u{1F545}\u{1F546}\u{1F547}\u{1F548}\u{1F549}\u{1F54A}\u{1F54B}\u{1F54C}\u{1F54D}\u{1F54E}\u{1F54F}\u{1F550}\u{1F551}\u{1F552}\u{1F553}\u{1F554}\u{1F555}\u{1F556}\u{1F557}\u{1F558}\u{1F559}\u{1F55A}\u{1F55B}\u{1F55C}\u{1F55D}\u{1F55E}\u{1F55F}\u{1F560}\u{1F561}\u{1F562}\u{1F563}\u{1F564}\u{1F565}\u{1F566}\u{1F567}\u{1F568}\u{1F569}\u{1F56A}\u{1F56B}\u{1F56C}\u{1F56D}\u{1F56E}\u{1F56F}\u{1F570}\u{1F571}\u{1F572}\u{1F573}\u{1F574}\u{1F575}\u{1F576}\u{1F577}\u{1F578}\u{1F579}\u{1F57A}\u{1F57B}\u{1F57C}\u{1F57D}\u{1F57E}\u{1F57F}\u{1F580}\u{1F581}\u{1F582}\u{1F583}\u{1F584}\u{1F585}\u{1F586}\u{1F587}\u{1F588}\u{1F589}\u{1F58A}\u{1F58B}\u{1F58C}\u{1F58D}\u{1F58E}\u{1F58F}\u{1F590}\u{1F591}\u{1F592}\u{1F593}\u{1F594}\u{1F595}\u{1F596}\u{1F597}\u{1F598}\u{1F599}\u{1F59A}\u{1F59B}\u{1F59C}\u{1F59D}\u{1F59E}\u{1F59F}\u{1F5A0}\u{1F5A1}\u{1F5A2}\u{1F5A3}\u{1F5A4}\u{1F5A5}\u{1F5A6}\u{1F5A7}\u{1F5A8}\u{1F5A9}\u{1F5AA}\u{1F5AB}\u{1F5AC}\u{1F5AD}\u{1F5AE}\u{1F5AF}\u{1F5B0}\u{1F5B1}\u{1F5B2}\u{1F5B3}\u{1F5B4}\u{1F5B5}\u{1F5B6}\u{1F5B7}\u{1F5B8}\u{1F5B9}\u{1F5BA}\u{1F5BB}\u{1F5BC}\u{1F5BD}\u{1F5BE}\u{1F5BF}\u{1F5C0}\u{1F5C1}\u{1F5C2}\u{1F5C3}\u{1F5C4}\u{1F5C5}\u{1F5C6}\u{1F5C7}\u{1F5C8}\u{1F5C9}\u{1F5CA}\u{1F5CB}\u{1F5CC}\u{1F5CD}\u{1F5CE}\u{1F5CF}\u{1F5D0}\u{1F5D1}\u{1F5D2}\u{1F5D3}\u{1F5D4}\u{1F5D5}\u{1F5D6}\u{1F5D7}\u{1F5D8}\u{1F5D9}\u{1F5DA}\u{1F5DB}\u{1F5DC}\u{1F5DD}\u{1F5DE}\u{1F5DF}\u{1F5E0}\u{1F5E1}\u{1F5E2}\u{1F5E3}\u{1F5E4}\u{1F5E5}\u{1F5E6}\u{1F5E7}\u{1F5E8}\u{1F5E9}\u{1F5EA}\u{1F5EB}\u{1F5EC}\u{1F5ED}\u{1F5EE}\u{1F5EF}\u{1F5F0}\u{1F5F1}\u{1F5F2}\u{1F5F3}\u{1F5F4}\u{1F5F5}\u{1F5F6}\u{1F5F7}\u{1F5F8}\u{1F5F9}\u{1F5FA}\u{1F5FB}\u{1F5FC}\u{1F5FD}\u{1F5FE}\u{1F5FF}\u{2611}\u{2614}\u{2615}\u{2648}\u{2649}\u{264A}\u{264B}\u{264C}\u{264D}\u{264E}\u{264F}\u{2650}\u{2651}\u{2652}\u{2653}\u{2660}\u{2663}\u{2665}\u{2666}\u{267B}\u{2693}\u{26AA}\u{26AB}\u{26BD}\u{26BE}\u{26C4}\u{26C5}\u{26CE}\u{26D4}\u{26EA}\u{26F2}\u{26F3}\u{26F5}\u{26FA}\u{26FD}\u{2B05}\u{2B06}\u{2B07}\u{2934}\u{2935}\u{2B55}\u{3030}\u{303D}\u{3297}\u{3299}\u{23CF}\u{23E9}\u{23EA}\u{23EB}\u{23EC}\u{23ED}\u{23EE}\u{23EF}\u{23F0}\u{23F1}\u{23F2}\u{23F3}\u{23F8}\u{23F9}\u{23FA}\u{26AB}\u{26AA}\u{26BD}\u{26BE}\u{26C4}\u{26C5}\u{26CE}\u{26D4}\u{26EA}\u{26F2}\u{26F3}\u{26F5}\u{26FA}\u{26FD}",
+    "Flags": "\u{1F1E6}\u{1F1E8}\u{1F1E6}\u{1F1FA}\u{1F1E6}\u{1F1F2}\u{1F1E6}\u{1F1EA}\u{1F1E6}\u{1F1F7}\u{1F1E6}\u{1F1FB}\u{1F1E6}\u{1F1F1}\u{1F1E6}\u{1F1F0}\u{1F1E6}\u{1F1EC}\u{1F1E6}\u{1F1EE}\u{1F1E6}\u{1F1F6}\u{1F1E6}\u{1F1FA}\u{1F1E6}\u{1F1F8}\u{1F1E7}\u{1F1E9}\u{1F1E7}\u{1F1E7}\u{1F1E7}\u{1F1E9}\u{1F1E7}\u{1F1EA}\u{1F1E7}\u{1F1EC}\u{1F1E7}\u{1F1ED}\u{1F1E7}\u{1F1EE}\u{1F1E7}\u{1F1F2}\u{1F1E7}\u{1F1F4}\u{1F1E7}\u{1F1F8}\u{1F1E7}\u{1F1F9}\u{1F1E7}\u{1F1FB}\u{1F1E7}\u{1F1FC}\u{1F1E8}\u{1F1E8}\u{1F1E8}\u{1F1E9}\u{1F1E8}\u{1F1EB}\u{1F1E8}\u{1F1F1}\u{1F1E8}\u{1F1F3}\u{1F1E8}\u{1F1F4}\u{1F1E8}\u{1F1F5}\u{1F1E8}\u{1F1F7}\u{1F1E8}\u{1F1F8}\u{1F1E8}\u{1F1F9}\u{1F1E8}\u{1F1FB}\u{1F1E8}\u{1F1FC}\u{1F1E8}\u{1F1FD}\u{1F1E8}\u{1F1FE}\u{1F1E8}\u{1F1FF}\u{1F1E9}\u{1F1EA}\u{1F1E9}\u{1F1EC}\u{1F1E9}\u{1F1EF}\u{1F1E9}\u{1F1F0}\u{1F1E9}\u{1F1F2}\u{1F1E9}\u{1F1F4}\u{1F1E9}\u{1F1FF}\u{1F1EA}\u{1F1E6}\u{1F1EA}\u{1F1EA}\u{1F1EA}\u{1F1EC}\u{1F1EA}\u{1F1F7}\u{1F1EA}\u{1F1F8}\u{1F1EA}\u{1F1F9}\u{1F1EA}\u{1F1FA}\u{1F1EC}\u{1F1E6}\u{1F1EC}\u{1F1E7}\u{1F1EC}\u{1F1E9}\u{1F1EC}\u{1F1EA}\u{1F1EC}\u{1F1EC}\u{1F1ED}\u{1F1EC}\u{1F1EE}\u{1F1EC}\u{1F1F1}\u{1F1EC}\u{1F1F2}\u{1F1EC}\u{1F1F3}\u{1F1EC}\u{1F1F5}\u{1F1EC}\u{1F1F7}\u{1F1EC}\u{1F1F8}\u{1F1EC}\u{1F1F9}\u{1F1EC}\u{1F1FA}\u{1F1EC}\u{1F1FC}\u{1F1EC}\u{1F1FE}\u{1F1ED}\u{1F1F0}\u{1F1ED}\u{1F1F2}\u{1F1ED}\u{1F1F3}\u{1F1ED}\u{1F1F7}\u{1F1ED}\u{1F1F9}\u{1F1ED}\u{1F1FA}\u{1F1EE}\u{1F1E8}\u{1F1EE}\u{1F1E9}\u{1F1EE}\u{1F1EA}\u{1F1EE}\u{1F1F1}\u{1F1EE}\u{1F1F2}\u{1F1EE}\u{1F1F6}\u{1F1EE}\u{1F1F7}\u{1F1EE}\u{1F1F8}\u{1F1EE}\u{1F1F9}\u{1F1EE}\u{1F1FA}\u{1F1EE}\u{1F1FF}\u{1F1EF}\u{1F1EA}\u{1F1EF}\u{1F1F2}\u{1F1EF}\u{1F1F5}\u{1F1F0}\u{1F1E8}\u{1F1F0}\u{1F1EC}\u{1F1F0}\u{1F1ED}\u{1F1F0}\u{1F1EE}\u{1F1F0}\u{1F1F2}\u{1F1F0}\u{1F1F3}\u{1F1F0}\u{1F1F5}\u{1F1F0}\u{1F1F7}\u{1F1F0}\u{1F1FC}\u{1F1F0}\u{1F1FE}\u{1F1F0}\u{1F1FF}\u{1F1F1}\u{1F1E6}\u{1F1F1}\u{1F1E7}\u{1F1F1}\u{1F1E8}\u{1F1F1}\u{1F1EE}\u{1F1F1}\u{1F1F0}\u{1F1F1}\u{1F1F7}\u{1F1F1}\u{1F1F8}\u{1F1F1}\u{1F1F9}\u{1F1F1}\u{1F1FA}\u{1F1F1}\u{1F1FB}\u{1F1F1}\u{1F1FE}\u{1F1F2}\u{1F1E8}\u{1F1F2}\u{1F1E9}\u{1F1F2}\u{1F1EA}\u{1F1F2}\u{1F1EB}\u{1F1F2}\u{1F1EC}\u{1F1F2}\u{1F1ED}\u{1F1F2}\u{1F1F0}\u{1F1F2}\u{1F1F1}\u{1F1F2}\u{1F1F2}\u{1F1F3}\u{1F1F2}\u{1F1F4}\u{1F1F2}\u{1F1F5}\u{1F1F2}\u{1F1F6}\u{1F1F2}\u{1F1F7}\u{1F1F2}\u{1F1F8}\u{1F1F2}\u{1F1F9}\u{1F1F2}\u{1F1FA}\u{1F1F2}\u{1F1FB}\u{1F1F2}\u{1F1FC}\u{1F1F2}\u{1F1FD}\u{1F1F2}\u{1F1FE}\u{1F1F2}\u{1F1FF}\u{1F1F3}\u{1F1E6}\u{1F1F3}\u{1F1E8}\u{1F1F3}\u{1F1EA}\u{1F1F3}\u{1F1EC}\u{1F1F3}\u{1F1EE}\u{1F1F3}\u{1F1F1}\u{1F1F3}\u{1F1F4}\u{1F1F3}\u{1F1F5}\u{1F1F3}\u{1F1F7}\u{1F1F3}\u{1F1FA}\u{1F1F3}\u{1F1FF}\u{1F1F4}\u{1F1E8}\u{1F1F4}\u{1F1EC}\u{1F1F4}\u{1F1F3}\u{1F1F4}\u{1F1F5}\u{1F1F4}\u{1F1F7}\u{1F1F4}\u{1F1F8}\u{1F1F4}\u{1F1F9}\u{1F1F4}\u{1F1FA}\u{1F1F4}\u{1F1FB}\u{1F1F4}\u{1F1FE}\u{1F1F5}\u{1F1E6}\u{1F1F5}\u{1F1E8}\u{1F1F5}\u{1F1EB}\u{1F1F5}\u{1F1EC}\u{1F1F5}\u{1F1ED}\u{1F1F5}\u{1F1F0}\u{1F1F5}\u{1F1F1}\u{1F1F5}\u{1F1F2}\u{1F1F5}\u{1F1F3}\u{1F1F5}\u{1F1F5}\u{1F1F5}\u{1F1F7}\u{1F1F5}\u{1F1F8}\u{1F1F5}\u{1F1F9}\u{1F1F5}\u{1F1FB}\u{1F1F5}\u{1F1FD}\u{1F1F5}\u{1F1FE}\u{1F1F5}\u{1F1FF}\u{1F1F6}\u{1F1E6}\u{1F1F6}\u{1F1E7}\u{1F1F6}\u{1F1E8}\u{1F1F6}\u{1F1E9}\u{1F1F6}\u{1F1EA}\u{1F1F6}\u{1F1EB}\u{1F1F6}\u{1F1EC}\u{1F1F6}\u{1F1ED}\u{1F1F6}\u{1F1EE}\u{1F1F6}\u{1F1EF}\u{1F1F6}\u{1F1F0}\u{1F1F6}\u{1F1F1}\u{1F1F6}\u{1F1F2}\u{1F1F6}\u{1F1F3}\u{1F1F6}\u{1F1F4}\u{1F1F6}\u{1F1F5}\u{1F1F6}\u{1F1F6}\u{1F1F6}\u{1F1F7}\u{1F1F6}\u{1F1F8}\u{1F1F6}\u{1F1F9}\u{1F1F6}\u{1F1FA}\u{1F1F6}\u{1F1FB}\u{1F1F6}\u{1F1FC}\u{1F1F6}\u{1F1FD}\u{1F1F6}\u{1F1FE}\u{1F1F6}\u{1F1FF}\u{1F1F7}\u{1F1EA}\u{1F1F7}\u{1F1F4}\u{1F1F7}\u{1F1F8}\u{1F1F7}\u{1F1FA}\u{1F1F7}\u{1F1FC}\u{1F1F8}\u{1F1E6}\u{1F1F8}\u{1F1E7}\u{1F1F8}\u{1F1E8}\u{1F1F8}\u{1F1E9}\u{1F1F8}\u{1F1EA}\u{1F1F8}\u{1F1EB}\u{1F1F8}\u{1F1EC}\u{1F1F8}\u{1F1ED}\u{1F1F8}\u{1F1EE}\u{1F1F8}\u{1F1EF}\u{1F1F8}\u{1F1F0}\u{1F1F8}\u{1F1F1}\u{1F1F8}\u{1F1F2}\u{1F1F8}\u{1F1F3}\u{1F1F8}\u{1F1F4}\u{1F1F8}\u{1F1F5}\u{1F1F8}\u{1F1F7}\u{1F1F8}\u{1F1F8}\u{1F1F8}\u{1F1F9}\u{1F1F8}\u{1F1FA}\u{1F1F8}\u{1F1FB}\u{1F1F8}\u{1F1FC}\u{1F1F8}\u{1F1FD}\u{1F1F8}\u{1F1FE}\u{1F1F8}\u{1F1FF}\u{1F1F9}\u{1F1E6}\u{1F1F9}\u{1F1E8}\u{1F1F9}\u{1F1EA}\u{1F1F9}\u{1F1EB}\u{1F1F9}\u{1F1EC}\u{1F1F9}\u{1F1ED}\u{1F1F9}\u{1F1EE}\u{1F1F9}\u{1F1EF}\u{1F1F9}\u{1F1F0}\u{1F1F9}\u{1F1F1}\u{1F1F9}\u{1F1F2}\u{1F1F9}\u{1F1F3}\u{1F1F9}\u{1F1F4}\u{1F1F9}\u{1F1F5}\u{1F1F9}\u{1F1F6}\u{1F1F9}\u{1F1F7}\u{1F1F9}\u{1F1F8}\u{1F1F9}\u{1F1F9}\u{1F1F9}\u{1F1FA}\u{1F1F9}\u{1F1FB}\u{1F1F9}\u{1F1FC}\u{1F1F9}\u{1F1FD}\u{1F1F9}\u{1F1FE}\u{1F1F9}\u{1F1FF}\u{1F1FA}\u{1F1E6}\u{1F1FA}\u{1F1E8}\u{1F1FA}\u{1F1EC}\u{1F1FA}\u{1F1F2}\u{1F1FA}\u{1F1F3}\u{1F1FA}\u{1F1F5}\u{1F1FA}\u{1F1F8}\u{1F1FA}\u{1F1FE}\u{1F1FA}\u{1F1FF}\u{1F1FB}\u{1F1E6}\u{1F1FB}\u{1F1E8}\u{1F1FB}\u{1F1EA}\u{1F1FB}\u{1F1EC}\u{1F1FB}\u{1F1EE}\u{1F1FB}\u{1F1F3}\u{1F1FB}\u{1F1F4}\u{1F1FB}\u{1F1F8}\u{1F1FB}\u{1F1FA}\u{1F1FB}\u{1F1FC}\u{1F1FB}\u{1F1FE}\u{1F1FB}\u{1F1FF}\u{1F1FC}\u{1F1E6}\u{1F1FC}\u{1F1EA}\u{1F1FC}\u{1F1F8}\u{1F1FC}\u{1F1EB}\u{1F1FC}\u{1F1F3}\u{1F1FC}\u{1F1F4}\u{1F1FC}\u{1F1F8}\u{1F1FC}\u{1F1F9}\u{1F1FC}\u{1F1FB}\u{1F1FC}\u{1F1FE}\u{1F1FC}\u{1F1FF}\u{1F1FD}\u{1F1F0}\u{1F1FD}\u{1F1F2}\u{1F1FD}\u{1F1F3}\u{1F1FD}\u{1F1F5}\u{1F1FD}\u{1F1F7}\u{1F1FD}\u{1F1F8}\u{1F1FD}\u{1F1F9}\u{1F1FD}\u{1F1FA}\u{1F1FD}\u{1F1FE}\u{1F1FD}\u{1F1FF}\u{1F1FE}\u{1F1E6}\u{1F1FE}\u{1F1EA}\u{1F1FE}\u{1F1EC}\u{1F1FE}\u{1F1F2}\u{1F1FE}\u{1F1F6}\u{1F1FE}\u{1F1F8}\u{1F1FE}\u{1F1F9}\u{1F1FE}\u{1F1FB}\u{1F1FE}\u{1F1FC}\u{1F1FE}\u{1F1FD}\u{1F1FE}\u{1F1FF}\u{1F1FF}\u{1F1E6}\u{1F1FF}\u{1F1E8}\u{1F1FF}\u{1F1EC}\u{1F1FF}\u{1F1F0}\u{1F1FF}\u{1F1F2}\u{1F1FF}\u{1F1F3}\u{1F1FF}\u{1F1F5}\u{1F1FF}\u{1F1F7}\u{1F1FF}\u{1F1F8}\u{1F1FF}\u{1F1F9}\u{1F1FF}\u{1F1FA}\u{1F1FF}\u{1F1FC}"
+  };
+
   /* ---------- Converter wiring ---------- */
   function initConverter() {
     var widgets = document.querySelectorAll("[data-converter]");
@@ -103,29 +114,28 @@
 
       if (!inArea || !outEl) return;
 
-      /* Read default direction */
       var direction = null;
       Array.prototype.forEach.call(dirTabs, function (t) {
         if (t.getAttribute("aria-selected") === "true") direction = t.getAttribute("data-direction");
       });
       if (!direction) direction = "hinglish-to-hindi";
       var scope = "sentence";
-      var hinglishMode = true; /* true = type in English to get Hindi suggestions */
+      var hinglishMode = true;
 
       /* --- Build toolbar --- */
       var toolbar = document.createElement("div");
       toolbar.className = "tool-toolbar";
       toolbar.innerHTML =
         '<span class="tb-label">Mode:</span>' +
-        '<button class="tb-btn active" data-tb-mode="hinglish" title="Hinglish mode (type English → get Hindi)">अ/abc</button>' +
-        '<button class="tb-btn" data-tb-mode="english" title="English mode (no conversion)">abc</button>' +
+        '<button class="tb-btn active" data-tb-mode="hinglish" title="Hinglish mode (type English, get Hindi)">HIN</button>' +
+        '<button class="tb-btn" data-tb-mode="english" title="English mode (no conversion)">ENG</button>' +
         '<span class="tb-sep"></span>' +
-        '<button class="tb-btn" data-tb-toggle="fullstop" title="Toggle . → । in Hindi mode">।</button>' +
-        '<button class="tb-btn" data-tb-toggle="numbers" title="Toggle 123 → १२३">१२३</button>' +
+        '<button class="tb-btn" data-tb-toggle="fullstop" title="Full-stop: . becomes 1">&#x0964;</button>' +
+        '<button class="tb-btn" data-tb-toggle="numbers" title="Numbers: 123 becomes Devanagari">&#x0967;&#x0968;&#x0969;</button>' +
         '<span class="tb-sep"></span>' +
-        '<button class="tb-btn" data-tb-action="voice" title="Voice typing (Web Speech API)">🎤</button>' +
-        '<button class="tb-btn" data-tb-action="emoji" title="Insert emoji">😊</button>' +
-        '<button class="tb-btn" data-tb-action="keyboard" title="On-screen Devanagari keyboard">⌨</button>';
+        '<button class="tb-btn" data-tb-action="voice" title="Voice typing">&#x1F3A4;</button>' +
+        '<button class="tb-btn" data-tb-action="emoji" title="Insert emoji">&#x1F60A;</button>' +
+        '<button class="tb-btn" data-tb-action="keyboard" title="On-screen Devanagari keyboard">&#x2328;</button>';
       w.insertBefore(toolbar, w.querySelector(".scope-row"));
 
       var tbModeBtns = toolbar.querySelectorAll("[data-tb-mode]");
@@ -148,7 +158,7 @@
           Array.prototype.forEach.call(tbModeBtns, function (b) {
             b.classList.toggle("active", b.getAttribute("data-tb-mode") === mode);
           });
-          showToast(hinglishMode ? "अ/abc — Hinglish mode" : "abc — English mode");
+          showToast(hinglishMode ? "Hindi mode" : "English mode");
         });
       });
 
@@ -156,80 +166,117 @@
       if (tbFullstop) tbFullstop.addEventListener("click", function () {
         fullstopOn = !fullstopOn;
         tbFullstop.classList.toggle("active", fullstopOn);
-        showToast(fullstopOn ? "। mode ON" : "। mode OFF");
+        showToast(fullstopOn ? "Purn Viram ON" : "Purn Viram OFF");
       });
 
       /* Number toggle */
       if (tbNumbers) tbNumbers.addEventListener("click", function () {
         numbersOn = !numbersOn;
         tbNumbers.classList.toggle("active", numbersOn);
-        showToast(numbersOn ? "Devanagari numbers ON" : "Normal numbers ON");
+        showToast(numbersOn ? "Devanagari numbers" : "Normal numbers");
       });
 
       /* Voice typing */
       if (tbVoice) tbVoice.addEventListener("click", function () {
         if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
-          showToast("⚠ Voice typing not supported in this browser");
+          showToast("Voice needs Chrome or Edge browser");
           return;
         }
         if (voiceActive) {
-          if (recognition) recognition.stop();
+          if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
           voiceActive = false;
           tbVoice.classList.remove("active");
-          showToast("🎤 Voice typing stopped");
+          showToast("Mic stopped");
           return;
         }
-        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SR();
-        recognition.lang = hinglishMode ? "hi-IN" : "en-US";
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.onresult = function (e) {
-          var transcript = "";
-          for (var i = e.resultIndex; i < e.results.length; i++) {
-            transcript += e.results[i][0].transcript;
-          }
-          inArea.value += transcript;
-          inArea.dispatchEvent(new Event("input"));
-        };
-        recognition.onerror = function () { showToast("⚠ Voice error — try again"); };
-        recognition.onend = function () {
-          if (voiceActive) recognition.start();
-        };
-        recognition.start();
-        voiceActive = true;
-        tbVoice.classList.add("active");
-        showToast("🎤 Listening...");
+        try {
+          var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognition = new SR();
+          recognition.lang = hinglishMode ? "hi-IN" : "en-US";
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 1;
+          recognition.onresult = function (e) {
+            var transcript = "";
+            for (var i = e.resultIndex; i < e.results.length; i++) {
+              if (e.results[i].isFinal) {
+                transcript += e.results[i][0].transcript;
+              }
+            }
+            if (transcript) {
+              inArea.value += transcript;
+              inArea.dispatchEvent(new Event("input"));
+            }
+          };
+          recognition.onerror = function (e) {
+            if (e.error === "no-speech") { showToast("No speech detected"); }
+            else if (e.error === "not-allowed") { showToast("Microphone access denied"); }
+            else if (e.error !== "aborted") { showToast("Voice error: " + e.error); }
+            voiceActive = false;
+            tbVoice.classList.remove("active");
+          };
+          recognition.onend = function () {
+            voiceActive = false;
+            tbVoice.classList.remove("active");
+          };
+          recognition.start();
+          voiceActive = true;
+          tbVoice.classList.add("active");
+          showToast("Listening...");
+        } catch (e) {
+          showToast("Voice not available");
+        }
       });
 
       /* Emoji picker */
       var emojiPicker = null;
-      if (tbEmoji) tbEmoji.addEventListener("click", function () {
-        if (emojiPicker && emojiPicker.parentNode) {
-          emojiPicker.parentNode.removeChild(emojiPicker);
-          emojiPicker = null;
-          return;
-        }
-        var emojis = "😀😂🤣😍🥰😎🤩🤔😮😢😡🥳😴🤯🙌💪🔥❤️💯✨🎉👏🙏😏🙄😬🤯🫡🤩🥳😎😊🥰😍🤩😎🥳😊😅🤣😂😁🤔😏🙄😬😮‍💨🤯🫠😴🥱😪😮😪😢😭😤😡🤬😈👿💀👻👽🤖💩🤡👹👺😸😺😻🙀😿😾😼😽🙀😿😾😸😺😻🙀😿😾😼😽🙀😿😾";
+      function buildEmojiPicker() {
         emojiPicker = document.createElement("div");
-        emojiPicker.className = "suggestion-list show";
-        emojiPicker.style.flexWrap = "wrap";
-        emojiPicker.style.maxWidth = "320px";
-        emojiPicker.style.padding = "8px";
-        for (var i = 0; i < emojis.length; i++) {
-          var span = document.createElement("li");
-          span.textContent = emojis[i];
-          span.style.padding = "5px 7px";
-          span.style.fontSize = "1.3rem";
-          span.style.cursor = "pointer";
-          span.addEventListener("click", function () {
+        emojiPicker.className = "emoji-popup";
+        emojiPicker.style.display = "none";
+        var html = '<div class="emoji-tabs">';
+        var catNames = Object.keys(EMOJI_DATA);
+        catNames.forEach(function (cat, i) {
+          html += '<button class="emoji-tab' + (i === 0 ? " active" : "") + '" data-ecat="' + cat + '">' + cat + "</button>";
+        });
+        html += '</div><div class="emoji-grid" data-emoji-grid></div>';
+        emojiPicker.innerHTML = html;
+        toolbar.appendChild(emojiPicker);
+        renderEmojiCat(catNames[0]);
+        var tabs = emojiPicker.querySelectorAll(".emoji-tab");
+        Array.prototype.forEach.call(tabs, function (tab) {
+          tab.addEventListener("click", function () {
+            Array.prototype.forEach.call(tabs, function (t) { t.classList.remove("active"); });
+            tab.classList.add("active");
+            renderEmojiCat(tab.getAttribute("data-ecat"));
+          });
+        });
+      }
+      function renderEmojiCat(cat) {
+        var grid = emojiPicker.querySelector("[data-emoji-grid]");
+        if (!grid) return;
+        grid.innerHTML = "";
+        var raw = EMOJI_DATA[cat] || "";
+        var emojis = Array.from ? Array.from(raw) : raw.split("");
+        emojis.forEach(function (ch) {
+          if (ch === " " || ch === "\u200D") return;
+          var btn = document.createElement("button");
+          btn.className = "emoji-btn";
+          btn.textContent = ch;
+          btn.addEventListener("click", function () {
             inArea.value += this.textContent;
             inArea.dispatchEvent(new Event("input"));
             inArea.focus();
           });
-          emojiPicker.appendChild(span);
-        }
-        toolbar.appendChild(emojiPicker);
+          grid.appendChild(btn);
+        });
+      }
+      if (tbEmoji) tbEmoji.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!emojiPicker) buildEmojiPicker();
+        var isVisible = emojiPicker.style.display === "block";
+        emojiPicker.style.display = isVisible ? "none" : "block";
+        tbEmoji.classList.toggle("active", !isVisible);
       });
 
       /* On-screen keyboard */
@@ -297,7 +344,8 @@
           var li = document.createElement("li");
           li.innerHTML = '<span class="sug-hi">' + esc(s) + '</span><span class="sug-en">' + esc(word) + '</span>';
           if (idx === 0) li.className = "selected";
-          li.addEventListener("click", function () {
+          li.addEventListener("mousedown", function (e) {
+            e.preventDefault();
             applySuggestion(s, word);
           });
           sugList.appendChild(li);
@@ -315,12 +363,10 @@
         var val = inArea.value;
         var pos = inArea.selectionStart;
         var before = val.slice(0, pos);
-        var after = val.slice(pos);
-        /* Find the start of the current word */
         var wordStart = before.lastIndexOf(" ");
         if (wordStart === -1) wordStart = 0; else wordStart += 1;
         var prefix = val.slice(0, wordStart);
-        var suffix = after.replace(/^\S+/, "");
+        var suffix = val.slice(pos).replace(/^\S+/, "");
         inArea.value = prefix + suggestion + " " + suffix;
         var newPos = prefix.length + suggestion.length + 1;
         inArea.setSelectionRange(newPos, newPos);
@@ -341,18 +387,15 @@
           sugSelectedIdx = Math.max(sugSelectedIdx - 1, 0);
           updateSugHighlight();
           return true;
-        } else if (e.key === "Enter" || e.key === " ") {
-          if (sugSelectedIdx >= 0 && sugSelectedIdx < sugWords.length) {
-            e.preventDefault();
-            var val = inArea.value;
-            var pos = inArea.selectionStart;
-            var before = val.slice(0, pos);
-            var wordStart = before.lastIndexOf(" ");
-            if (wordStart === -1) wordStart = 0; else wordStart += 1;
-            var originalWord = val.slice(wordStart, pos);
-            applySuggestion(sugWords[sugSelectedIdx], originalWord);
-            return true;
-          }
+        } else if (e.key === "Enter" && sugSelectedIdx >= 0 && sugSelectedIdx < sugWords.length) {
+          e.preventDefault();
+          var val = inArea.value;
+          var pos = inArea.selectionStart;
+          var before = val.slice(0, pos);
+          var wordStart = before.lastIndexOf(" ");
+          if (wordStart === -1) wordStart = 0; else wordStart += 1;
+          applySuggestion(sugWords[sugSelectedIdx], val.slice(wordStart, pos));
+          return true;
         } else if (e.key === "Escape") {
           hideSuggestions();
           return true;
@@ -405,19 +448,19 @@
         if (statsEl) {
           var chars = (res.output || "").length;
           var tokens = (res.output || "").split(/\s+/).filter(Boolean).length;
-          statsEl.innerHTML = "<strong>" + chars + "</strong> chars · <strong>" + tokens + "</strong> words · <strong>" + res.details.length + "</strong> mapped";
+          statsEl.innerHTML = "<strong>" + chars + "</strong> chars \u00B7 <strong>" + tokens + "</strong> words \u00B7 <strong>" + res.details.length + "</strong> mapped";
         }
         if (placeholderEl) placeholderEl.style.display = "none";
         outEl.textContent = res.output || "";
         if (bannerEl && scope === "word" && res.details.length) {
           if (bannerText) {
             bannerText.innerHTML = res.details.slice(0, 5).map(function (d) {
-              return "<strong>" + esc(d.from) + "</strong> → " + esc(d.to);
-            }).join("  ·  ");
+              return "<strong>" + esc(d.from) + "</strong> \u2192 " + esc(d.to);
+            }).join("  \u00B7  ");
           }
           bannerEl.classList.add("show");
         }
-        if (!silent && res.output) showToast("✨ Converted!");
+        if (!silent && res.output) showToast("Converted!");
       }
 
       /* --- Swap --- */
@@ -436,7 +479,7 @@
           o.setAttribute("aria-selected", o.getAttribute("data-direction") === direction ? "true" : "false");
         });
         updateLabels();
-        showToast("🔄 Swapped direction");
+        showToast("Swapped direction");
       }
 
       /* --- Clear --- */
@@ -449,14 +492,14 @@
         if (convertBtn) convertBtn.disabled = true;
         hideSuggestions();
         saveLocal();
-        showToast("🧹 Input cleared");
+        showToast("Input cleared");
       }
       function doClearOutput() {
         outEl.textContent = "";
         if (placeholderEl) placeholderEl.style.display = "";
         if (statsEl) statsEl.innerHTML = "";
         if (bannerEl) bannerEl.classList.remove("show");
-        showToast("🧹 Output cleared");
+        showToast("Output cleared");
       }
       function doClearAll() {
         inArea.value = "";
@@ -467,15 +510,15 @@
         if (convertBtn) convertBtn.disabled = true;
         hideSuggestions();
         saveLocal();
-        showToast("🧹 Cleared all");
+        showToast("Cleared all");
       }
 
       /* --- Copy --- */
       function doCopy() {
         var text = outEl.textContent || "";
-        if (!text) { showToast("⚠ Nothing to copy"); return; }
+        if (!text) { showToast("Nothing to copy"); return; }
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(function () { showToast("📋 Copied!"); });
+          navigator.clipboard.writeText(text).then(function () { showToast("Copied!"); });
         } else {
           var ta = document.createElement("textarea");
           ta.value = text;
@@ -483,41 +526,38 @@
           ta.select();
           document.execCommand("copy");
           document.body.removeChild(ta);
-          showToast("📋 Copied!");
+          showToast("Copied!");
         }
       }
 
       /* --- Download .txt --- */
       function doDownloadTxt() {
         var text = outEl.textContent || "";
-        if (!text) { showToast("⚠ Nothing to download"); return; }
+        if (!text) { showToast("Nothing to download"); return; }
         var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = "hinglish-output.txt";
         a.click();
         URL.revokeObjectURL(a.href);
-        showToast("📥 Downloaded .txt");
+        showToast("Downloaded .txt");
       }
 
       /* --- Share WhatsApp --- */
       function doShareWhatsApp() {
         var text = outEl.textContent || inArea.value || "";
-        if (!text) { showToast("⚠ Nothing to share"); return; }
+        if (!text) { showToast("Nothing to share"); return; }
         window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
-        showToast("📤 Opening WhatsApp...");
       }
 
       /* --- Email --- */
       function doEmail() {
         var text = outEl.textContent || inArea.value || "";
-        if (!text) { showToast("⚠ Nothing to email"); return; }
+        if (!text) { showToast("Nothing to email"); return; }
         window.location.href = "mailto:?subject=Hinglish%20Text&body=" + encodeURIComponent(text);
-        showToast("📧 Opening email...");
       }
 
       /* --- localStorage save/restore --- */
-      var LS_KEY = "hinglish_editor_" + (direction || "default");
       function saveLocal() {
         try { localStorage.setItem("hinglish_editor_text", inArea.value); } catch (e) { /* ignore */ }
       }
@@ -543,8 +583,8 @@
       actionBar.innerHTML =
         '<button class="act-btn" data-act="copy" title="Copy output"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>' +
         '<button class="act-btn" data-act="txt" title="Download as .txt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>.txt</button>' +
-        '<button class="act-btn" data-act="whatsapp" title="Share on WhatsApp">💬 WhatsApp</button>' +
-        '<button class="act-btn" data-act="email" title="Share via email">📧 Email</button>' +
+        '<button class="act-btn" data-act="whatsapp" title="Share on WhatsApp">WhatsApp</button>' +
+        '<button class="act-btn" data-act="email" title="Share via email">Email</button>' +
         '<span class="act-counter" data-word-counter></span>';
       w.appendChild(actionBar);
 
@@ -555,15 +595,14 @@
 
       var wordCounter = actionBar.querySelector("[data-word-counter]");
 
-      /* --- Input handler (with suggestions) --- */
+      /* --- Input handler --- */
       inArea.addEventListener("input", function () {
         if (convertBtn) convertBtn.disabled = !inArea.value.trim();
         saveLocal();
-        /* Word counter */
         if (wordCounter) {
           var wc = inArea.value.trim() ? inArea.value.trim().split(/\s+/).length : 0;
           var cc = inArea.value.length;
-          wordCounter.textContent = wc + " words · " + cc + " chars";
+          wordCounter.textContent = wc + " words \u00B7 " + cc + " chars";
         }
         /* Auto-convert */
         if (inArea.value.trim()) run(true); else {
@@ -576,12 +615,9 @@
           var val = inArea.value;
           var pos = inArea.selectionStart;
           var before = val.slice(0, pos);
-          var lastSpace = before.lastIndexOf(" ");
-          var currentWord = (lastSpace === -1 ? before : before.slice(lastSpace + 1)).trim();
-          if (currentWord.length >= 2 && /\s$/.test(val.slice(0, pos))) {
-            /* Space was just pressed — fetch suggestions for the previous word */
-            var prevSpace = before.slice(0, -1).lastIndexOf(" ");
-            var prevWord = (prevSpace === -1 ? before.slice(0, -1) : before.slice(prevSpace + 1, -1)).trim();
+          if (/\s$/.test(before) && before.trim().length > 0) {
+            var prevSpace = before.trimEnd().lastIndexOf(" ");
+            var prevWord = (prevSpace === -1 ? before.trimEnd() : before.trimEnd().slice(prevSpace + 1));
             if (prevWord.length >= 2) {
               window.HINGLISH_CONVERTER.fetchSuggestions(prevWord, function (suggestions) {
                 if (suggestions.length > 1) {
@@ -595,7 +631,6 @@
 
       /* --- Keyboard shortcuts in textarea --- */
       inArea.addEventListener("keydown", function (e) {
-        /* Handle suggestion navigation first */
         if (sugList && sugList.classList.contains("show")) {
           if (handleSuggestionKeys(e)) return;
         }
