@@ -163,7 +163,7 @@
     xhr.send();
   }
 
-  /* ---------- Direction-aware conversion ---------- */
+  /* ---------- Direction-aware conversion (2 directions only) ---------- */
   function convert(text, direction) {
     var input = String(text || "");
     if (!input.trim()) return { output: "", details: [] };
@@ -173,13 +173,12 @@
       var out = [];
       var details = [];
       var hh = getDict("hinglishHindi");
-      var ehd = getDict("englishHindi");
       pieces.forEach(function (piece) {
         if (/^\s*$/.test(piece)) { out.push(piece); return; }
         var word = piece.trim();
         var punct = piece.replace(word, "");
         var key = word.toLowerCase();
-        var hindi = hh[key] || ehd[key];
+        var hindi = hh[key];
         if (!hindi) hindi = latinToDevanagari(word);
         out.push(hindi + punct);
         if (word !== hindi) {
@@ -189,42 +188,8 @@
       return { output: out.join(""), details: details, mode: "hi" };
     }
 
-    if (direction === "hindi-to-hinglish") {
-      return { output: devanagariToLatin(input), details: [], mode: "la" };
-    }
-
-    if (direction === "hinglish-to-english") {
-      var words = input.split(/(\s+)/);
-      var out2 = [];
-      var details2 = [];
-      var he = getDict("hinglishEnglish");
-      words.forEach(function (w) {
-        if (/^\s*$/.test(w)) { out2.push(w); return; }
-        var key = w.toLowerCase().replace(/[^a-z]/g, "").trim();
-        if (key) {
-          var en = he[key];
-          if (en) { out2.push(en); details2.push({ from: w, to: en }); return; }
-        }
-        out2.push(w);
-      });
-      return { output: out2.join(""), details: details2, mode: "en" };
-    }
-
-    /* english-to-hinglish */
-    var toks = input.split(/(\s+)/);
-    var res = [];
-    var det = [];
-    var ehMap = getDict("englishHinglish");
-    toks.forEach(function (w) {
-      if (/^\s*$/.test(w)) { res.push(w); return; }
-      var key = w.toLowerCase().replace(/[^a-z]/g, "");
-      if (key) {
-        var hi = ehMap[key];
-        if (hi) { res.push(hi); det.push({ from: w, to: hi }); return; }
-      }
-      res.push(w);
-    });
-    return { output: res.join(""), details: det, mode: "en" };
+    /* hindi-to-hinglish */
+    return { output: devanagariToLatin(input), details: [], mode: "la" };
   }
 
   /* ---------- Devanagari keyboard data ---------- */
@@ -249,10 +214,8 @@
     suggestionCache: suggestionCache,
     keyboardData: keyboardData,
     labels: {
-      "hinglish-to-hindi": ["Hinglish", "हिंदी"],
-      "hindi-to-hinglish": ["हिंदी", "Hinglish"],
-      "hinglish-to-english": ["Hinglish", "English"],
-      "english-to-hinglish": ["English", "Hinglish"]
+      "hinglish-to-hindi": ["Hinglish", "\u0939\u093F\u0928\u094D\u0926\u0940"],
+      "hindi-to-hinglish": ["\u0939\u093F\u0928\u094D\u0926\u0940", "Hinglish"]
     }
   };
 })(typeof window !== "undefined" ? window : this);

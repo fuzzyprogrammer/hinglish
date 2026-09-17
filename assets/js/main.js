@@ -126,19 +126,15 @@
       var toolbar = document.createElement("div");
       toolbar.className = "tool-toolbar";
       toolbar.innerHTML =
-        '<span class="tb-label">Mode:</span>' +
-        '<button class="tb-btn active" data-tb-mode="hinglish" title="Hinglish mode (type English, get Hindi)">HIN</button>' +
-        '<button class="tb-btn" data-tb-mode="english" title="English mode (no conversion)">ENG</button>' +
+        '<button class="tb-btn" data-tb-action="voice" title="Use your device microphone to speak Hindi">&#x1F3A4; Speak</button>' +
         '<span class="tb-sep"></span>' +
-        '<button class="tb-btn" data-tb-toggle="fullstop" title="Full-stop: . becomes 1">&#x0964;</button>' +
-        '<button class="tb-btn" data-tb-toggle="numbers" title="Numbers: 123 becomes Devanagari">&#x0967;&#x0968;&#x0969;</button>' +
+        '<button class="tb-btn" data-tb-toggle="fullstop" title="Toggle . to 1 (Purn Viram)">&#x0964;</button>' +
+        '<button class="tb-btn" data-tb-toggle="numbers" title="Toggle 123 to Devanagari numbers">&#x0967;&#x0968;&#x0969;</button>' +
         '<span class="tb-sep"></span>' +
-        '<button class="tb-btn" data-tb-action="voice" title="Voice typing">&#x1F3A4;</button>' +
         '<button class="tb-btn" data-tb-action="emoji" title="Insert emoji">&#x1F60A;</button>' +
-        '<button class="tb-btn" data-tb-action="keyboard" title="On-screen Devanagari keyboard">&#x2328;</button>';
+        '<button class="tb-btn" data-tb-action="keyboard" title="On-screen Devanagari keyboard">&#x2328; Keyboard</button>';
       w.insertBefore(toolbar, w.querySelector(".scope-row"));
 
-      var tbModeBtns = toolbar.querySelectorAll("[data-tb-mode]");
       var tbFullstop = toolbar.querySelector("[data-tb-toggle='fullstop']");
       var tbNumbers = toolbar.querySelector("[data-tb-toggle='numbers']");
       var tbVoice = toolbar.querySelector("[data-tb-action='voice']");
@@ -149,18 +145,6 @@
       var numbersOn = false;
       var voiceActive = false;
       var recognition = null;
-
-      /* Mode toggle */
-      Array.prototype.forEach.call(tbModeBtns, function (btn) {
-        btn.addEventListener("click", function () {
-          var mode = btn.getAttribute("data-tb-mode");
-          hinglishMode = (mode === "hinglish");
-          Array.prototype.forEach.call(tbModeBtns, function (b) {
-            b.classList.toggle("active", b.getAttribute("data-tb-mode") === mode);
-          });
-          showToast(hinglishMode ? "Hindi mode" : "English mode");
-        });
-      });
 
       /* Full-stop toggle */
       if (tbFullstop) tbFullstop.addEventListener("click", function () {
@@ -176,55 +160,67 @@
         showToast(numbersOn ? "Devanagari numbers" : "Normal numbers");
       });
 
-      /* Voice typing */
+      /* Voice typing — uses system built-in speech recognition (Windows/Mac/Mobile) */
       if (tbVoice) tbVoice.addEventListener("click", function () {
-        if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
-          showToast("Voice needs Chrome or Edge browser");
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) {
+          showToast("Speech not supported — try Chrome or Edge browser");
           return;
         }
         if (voiceActive) {
           if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
           voiceActive = false;
           tbVoice.classList.remove("active");
+          tbVoice.innerHTML = '&#x1F3A4; Speak';
           showToast("Mic stopped");
           return;
         }
         try {
-          var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
           recognition = new SR();
-          recognition.lang = hinglishMode ? "hi-IN" : "en-US";
-          recognition.continuous = false;
+          recognition.lang = "hi-IN";
+          recognition.continuous = true;
           recognition.interimResults = true;
-          recognition.maxAlternatives = 1;
+          recognition.maxAlternatives = 3;
+          recognition.onstart = function () {
+            voiceActive = true;
+            tbVoice.classList.add("active");
+            tbVoice.innerHTML = '&#x1F3A4; Listening...';
+            showToast("Speak now — your device mic is active");
+          };
           recognition.onresult = function (e) {
-            var transcript = "";
+            var finalText = "";
             for (var i = e.resultIndex; i < e.results.length; i++) {
               if (e.results[i].isFinal) {
-                transcript += e.results[i][0].transcript;
+                finalText += e.results[i][0].transcript;
               }
             }
-            if (transcript) {
-              inArea.value += transcript;
+            if (finalText) {
+              inArea.value += (inArea.value && !/\s$/.test(inArea.value) ? " " : "") + finalText;
               inArea.dispatchEvent(new Event("input"));
             }
           };
           recognition.onerror = function (e) {
-            if (e.error === "no-speech") { showToast("No speech detected"); }
-            else if (e.error === "not-allowed") { showToast("Microphone access denied"); }
-            else if (e.error !== "aborted") { showToast("Voice error: " + e.error); }
+            if (e.error === "no-speech") { showToast("No speech detected — try again"); }
+            else if (e.error === "not-allowed") { showToast("Mic access denied — allow mic in browser settings"); }
+            else if (e.error === "network") { showToast("Speech requires internet connection"); }
+            else if (e.error !== "aborted") { showToast("Speech error: " + e.error); }
             voiceActive = false;
             tbVoice.classList.remove("active");
+            tbVoice.innerHTML = '&#x1F3A4; Speak';
           };
           recognition.onend = function () {
-            voiceActive = false;
-            tbVoice.classList.remove("active");
+            if (voiceActive) {
+              /* Auto-restart for continuous dictation */
+              try { recognition.start(); } catch (e) {
+                voiceActive = false;
+                tbVoice.classList.remove("active");
+                tbVoice.innerHTML = '&#x1F3A4; Speak';
+              }
+            }
           };
           recognition.start();
-          voiceActive = true;
-          tbVoice.classList.add("active");
-          showToast("Listening...");
         } catch (e) {
-          showToast("Voice not available");
+          showToast("Could not start speech recognition");
         }
       });
 
@@ -463,13 +459,9 @@
         if (!silent && res.output) showToast("Converted!");
       }
 
-      /* --- Swap --- */
+      /* --- Swap (only 2 directions) --- */
       function doSwap() {
-        var d = direction;
-        if (d === "hinglish-to-hindi") direction = "hindi-to-hinglish";
-        else if (d === "hindi-to-hinglish") direction = "hinglish-to-hindi";
-        else if (d === "hinglish-to-english") direction = "english-to-hinglish";
-        else if (d === "english-to-hinglish") direction = "hinglish-to-english";
+        direction = direction === "hinglish-to-hindi" ? "hindi-to-hinglish" : "hinglish-to-hindi";
         var myOut = outEl.textContent;
         inArea.value = myOut;
         outEl.textContent = "";
