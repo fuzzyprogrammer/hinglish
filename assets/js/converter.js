@@ -1,8 +1,8 @@
 /* ============================================================
-   Hinglish converter engine
-   - latinToDevanagari: Hinglish (roman) → Hindi (ITRANS-style)
-   - devanagariToLatin: Hindi → romanized Hinglish
-   - convert(): direction-aware hybrid (dictionary + translit)
+   Hinglish converter engine v2
+   - Google Input Tools API for Hinglish→Hindi (real-time)
+   - Offline fallback with ITRANS transliteration
+   - 4 conversion directions
    Exposed globals: HINGLISH_CONVERTER
    ============================================================ */
 (function (global) {
@@ -20,13 +20,11 @@
     "uu": ["ऊ", "ू"], "oo": ["ऊ", "ू"],
     "ri": ["ऋ", "ृ"], "ai": ["ऐ", "ै"],
     "au": ["औ", "ौ"], "ou": ["औ", "ौ"],
-    "ou": ["औ", "ौ"],
-    "a": ["अ", ""],  "i": ["इ", "ि"], "u": ["उ", "ु"],
+    "a": ["अ", ""], "i": ["इ", "ि"], "u": ["उ", "ु"],
     "e": ["ए", "े"], "o": ["ओ", "ो"],
     "M": ["ं", "ं"], "N": ["ं", "ं"], "H": ["ः", "ः"]
   };
 
-  /* ---------- Consonant tokens (longest-match) ---------- */
   var CONS = {
     "ksh": "क्ष", "ks": "क्ष", "x": "क्ष",
     "gyn": "ज्ञ", "gy": "ज्ञ", "j~n": "ज्ञ",
@@ -48,7 +46,6 @@
     "v": "व", "w": "व", "s": "स", "h": "ह"
   };
 
-  /* Letter-token (stroke) lookup for Devanagari → Latin */
   var DEVA = {
     "क": "k", "ख": "kh", "ग": "g", "घ": "gh", "ङ": "ng",
     "च": "ch", "छ": "chh", "ज": "j", "झ": "jh", "ञ": "ny",
@@ -60,16 +57,12 @@
     "क़": "q", "ख़": "kh", "ग़": "g", "ज़": "z", "ड़": "r", "ढ़": "rh", "फ़": "f",
     "क्ष": "ksh", "त्र": "tr", "ज्ञ": "gy",
     "अ": "a", "आ": "aa", "इ": "i", "ई": "ee", "उ": "u",
-    "ऊ": "oo", "ऋ": "ri", "ए": "e", "ऐ": "ai", "ओ": "o", "औ": "au", "अं": "an", "अः": "ah"
-  };
-  var MATRA = {
+    "ऊ": "oo", "ऋ": "ri", "ए": "e", "ऐ": "ai", "ओ": "o", "औ": "au",
     "ा": "aa", "ि": "i", "ी": "ee", "ु": "u", "ू": "oo",
     "ृ": "ri", "े": "e", "ै": "ai", "ो": "o", "ौ": "au",
     "ं": "n", "ँ": "n", "ः": "h", "्": ""
   };
-  var DIGITS = { "०": "0", "१": "1", "२": "2", "३": "3", "४": "4", "५": "5", "६": "6", "७": "7", "८": "8", "९": "9" };
 
-  /* Keys sorted by length desc for longest-match tokenizing */
   var keysSorted = [];
   (function buildKeys() {
     var all = {};
@@ -78,7 +71,7 @@
     keysSorted = Object.keys(all).sort(function (a, b) { return b.length - a.length; });
   })();
 
-  /* ---------- Latin (Hinglish) → Devanagari ---------- */
+  /* ---------- Latin → Devanagari (offline fallback) ---------- */
   function latinToDevanagari(text) {
     var lower = String(text).toLowerCase();
     var out = "";
@@ -105,7 +98,6 @@
         var ch = lower[i]; i++;
         if (/\s/.test(ch)) { out += ch; prevCons = false; }
         else if (/[a-z0-9]/.test(ch)) {
-          /* remnant unknown latin letter (e.g. standalone) — keep it */
           if (prevCons) { out += "्"; }
           out += ch;
           prevCons = false;
@@ -118,22 +110,57 @@
     return out;
   }
 
-  /* ---------- Devanagari → Latin (Hinglish) ---------- */
+  /* ---------- Devanagari → Latin ---------- */
   function devanagariToLatin(text) {
     var out = "";
     var i = 0;
-    var runVowel = false; // the standalone vowel rules handle it below
     while (i < text.length) {
       var ch = text[i];
       if (ch === "अ") { out += (text[i + 1] === "ं" ? "an" : "a"); i++; continue; }
       if (DEVA[ch]) { out += DEVA[ch]; i++; continue; }
-      if (MATRA.hasOwnProperty(ch)) { out += MATRA[ch]; i++; continue; }
-      if (DIGITS[ch]) { out += DIGITS[ch]; i++; continue; }
+      if (DEVA.hasOwnProperty(ch)) { out += DEVA[ch]; i++; continue; }
       if (ch === "।" || ch === "॥") { out += ". "; i++; continue; }
       if (/\s/.test(ch)) { out += ch; i++; continue; }
       out += ch; i++;
     }
     return out.trim();
+  }
+
+  /* ---------- Google Input Tools API ---------- */
+  var activeRequest = null;
+  var suggestionCache = {};
+
+  function fetchSuggestions(word, callback) {
+    if (!word || word.length < 1) { callback([]); return; }
+    var cached = suggestionCache[word.toLowerCase()];
+    if (cached) { callback(cached); return; }
+
+    if (activeRequest) { activeRequest.abort(); }
+    var xhr = new XMLHttpRequest();
+    var url = "https://inputtools.google.com/request?text=" +
+      encodeURIComponent(word) +
+      "&itc=hi-t-i0-und&num=5&cs=1&cp=0&ie=utf-8&oe=utf-8&app=demopage";
+    xhr.open("GET", url, true);
+    xhr.timeout = 3000;
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      if (xhr.status === 200) {
+        try {
+          var resp = JSON.parse(xhr.responseText);
+          var suggestions = (resp[1] && resp[1][1]) ? resp[1][1] : [];
+          suggestionCache[word.toLowerCase()] = suggestions;
+          callback(suggestions);
+        } catch (e) {
+          callback([latinToDevanagari(word)]);
+        }
+      } else {
+        callback([latinToDevanagari(word)]);
+      }
+    };
+    xhr.onerror = function () { callback([latinToDevanagari(word)]); };
+    xhr.ontimeout = function () { callback([latinToDevanagari(word)]); };
+    activeRequest = xhr;
+    xhr.send();
   }
 
   /* ---------- Direction-aware conversion ---------- */
@@ -200,16 +227,27 @@
     return { output: res.join(""), details: det, mode: "en" };
   }
 
-  function wordVariantCount(text, direction) {
-    if (direction === "hinglish-to-hindi" && getDict("hinglishHindi")[text.toLowerCase()]) return 2;
-    return 0;
-  }
+  /* ---------- Devanagari keyboard data ---------- */
+  var keyboardData = {
+    vowels: ["अ", "आ", "इ", "ई", "उ", "ऊ", "ए", "ऐ", "ओ", "औ", "अं", "अः", "ऋ"],
+    matras: ["ा", "ि", "ी", "ु", "ू", "ृ", "े", "ै", "ो", "ौ", "ं", "ः", "ँ"],
+    consonants: ["क", "ख", "ग", "घ", "ङ", "च", "छ", "ज", "झ", "ञ",
+                  "ट", "ठ", "ड", "ढ", "ण", "त", "थ", "द", "ध", "न",
+                  "प", "फ", "ब", "भ", "म", "य", "र", "ल", "व", "श",
+                  "ष", "स", "ह", "ळ"],
+    conjuncts: ["क्ष", "त्र", "ज्ञ"],
+    extra: ["क़", "ख़", "ग़", "ज़", "ड़", "ढ़", "फ़"],
+    numbers: ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"],
+    punctuation: ["।", "॥", "ॐ", "॰", "₹"]
+  };
 
   global.HINGLISH_CONVERTER = {
     latinToDevanagari: latinToDevanagari,
     devanagariToLatin: devanagariToLatin,
     convert: convert,
-    wordVariantCount: wordVariantCount,
+    fetchSuggestions: fetchSuggestions,
+    suggestionCache: suggestionCache,
+    keyboardData: keyboardData,
     labels: {
       "hinglish-to-hindi": ["Hinglish", "हिंदी"],
       "hindi-to-hinglish": ["हिंदी", "Hinglish"],
