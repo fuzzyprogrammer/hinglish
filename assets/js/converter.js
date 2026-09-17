@@ -8,7 +8,10 @@
 (function (global) {
   "use strict";
 
-  var HIN = (global.HIN || {});
+  function getDict(name) {
+    var root = (typeof window !== "undefined" ? window.HIN : global.HIN) || {};
+    return root[name] || {};
+  }
 
   /* ---------- Vowel tokens: [standalone, matra] ---------- */
   var VOWELS = {
@@ -142,14 +145,17 @@
       var pieces = input.split(/(\s+)/);
       var out = [];
       var details = [];
+      var hh = getDict("hinglishHindi");
+      var ehd = getDict("englishHindi");
       pieces.forEach(function (piece) {
         if (/^\s*$/.test(piece)) { out.push(piece); return; }
         var word = piece.trim();
         var punct = piece.replace(word, "");
-        var hindi = HIN.hinglishHindi[word.toLowerCase()];
+        var key = word.toLowerCase();
+        var hindi = hh[key] || ehd[key];
         if (!hindi) hindi = latinToDevanagari(word);
         out.push(hindi + punct);
-        if (word.toLowerCase() !== hindi) {
+        if (word !== hindi) {
           details.push({ from: word, to: hindi });
         }
       });
@@ -164,36 +170,38 @@
       var words = input.split(/(\s+)/);
       var out2 = [];
       var details2 = [];
+      var he = getDict("hinglishEnglish");
       words.forEach(function (w) {
         if (/^\s*$/.test(w)) { out2.push(w); return; }
-        var key = w.toLowerCase().replace(/[^a-z ]/g, "").trim();
+        var key = w.toLowerCase().replace(/[^a-z]/g, "").trim();
         if (key) {
-          var en = HIN.hinglishEnglish[key];
+          var en = he[key];
           if (en) { out2.push(en); details2.push({ from: w, to: en }); return; }
         }
         out2.push(w);
       });
-      return { output: out2.join(" "), details: details2, mode: "en" };
+      return { output: out2.join(""), details: details2, mode: "en" };
     }
 
     /* english-to-hinglish */
     var toks = input.split(/(\s+)/);
     var res = [];
     var det = [];
+    var ehMap = getDict("englishHinglish");
     toks.forEach(function (w) {
       if (/^\s*$/.test(w)) { res.push(w); return; }
       var key = w.toLowerCase().replace(/[^a-z]/g, "");
       if (key) {
-        var hi = HIN.englishHinglish[key];
+        var hi = ehMap[key];
         if (hi) { res.push(hi); det.push({ from: w, to: hi }); return; }
       }
       res.push(w);
     });
-    return { output: res.join(" "), details: det, mode: "en" };
+    return { output: res.join(""), details: det, mode: "en" };
   }
 
   function wordVariantCount(text, direction) {
-    if (direction === "hinglish-to-hindi" && HIN.hinglishHindi[text.toLowerCase()]) return 2;
+    if (direction === "hinglish-to-hindi" && getDict("hinglishHindi")[text.toLowerCase()]) return 2;
     return 0;
   }
 

@@ -58,6 +58,23 @@
     });
   }
 
+  /* ---------- Toast Pings ---------- */
+  function showToast(msg) {
+    var container = document.querySelector(".toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.className = "toast-container";
+      document.body.appendChild(container);
+    }
+    var toast = document.createElement("div");
+    toast.className = "toast-ping";
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(function () {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 2500);
+  }
+
   /* ---------- Converter wiring ---------- */
   function initConverter() {
     var widgets = document.querySelectorAll("[data-converter]");
@@ -78,8 +95,25 @@
       var placeholderEl = outEl ? outEl.querySelector("[data-output-placeholder]") : null;
 
       if (!inArea || !outEl) return;
-      var direction = dirTabs.length ? null : "hinglish-to-hindi";
+      var direction = null;
+      Array.prototype.forEach.call(dirTabs, function (t) {
+        if (t.getAttribute("aria-selected") === "true") {
+          direction = t.getAttribute("data-direction");
+        }
+      });
+      if (!direction) direction = "hinglish-to-hindi";
       var scope = "sentence";
+
+      /* Inject Shortcut Legend Bar */
+      if (!w.querySelector(".shortcut-bar")) {
+        var bar = document.createElement("div");
+        bar.className = "shortcut-bar";
+        bar.innerHTML = '<span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Convert</span> · ' +
+                        '<span><kbd>Alt</kbd>+<kbd>S</kbd> Swap</span> · ' +
+                        '<span><kbd>Alt</kbd>+<kbd>C</kbd> Copy</span> · ' +
+                        '<span><kbd>Alt</kbd>+<kbd>X</kbd> Clear</span>';
+        w.appendChild(bar);
+      }
 
       Array.prototype.forEach.call(dirTabs, function (t) {
         t.addEventListener("click", function () {
@@ -89,7 +123,7 @@
             o.setAttribute("aria-selected", sel ? "true" : "false");
           });
           updateLabels();
-          if (inArea.value.trim()) run();
+          if (inArea.value.trim()) run(true);
         });
       });
       Array.prototype.forEach.call(segBtns, function (s) {
@@ -98,7 +132,8 @@
           Array.prototype.forEach.call(segBtns, function (o) {
             o.setAttribute("aria-pressed", o === s ? "true" : "false");
           });
-          if (inArea.value.trim()) run();
+          showToast("Scope: " + scope.toUpperCase());
+          if (inArea.value.trim()) run(true);
         });
       });
 
@@ -109,7 +144,7 @@
         if (outLabel) outLabel.innerHTML = '<span class="dot dot--teal"></span>' + lab[1];
       }
 
-      function run() {
+      function run(silent) {
         var res = window.HINGLISH_CONVERTER.convert(inArea.value, direction);
         if (bannerEl) bannerEl.classList.remove("show");
         if (statsEl) statsEl.innerHTML = "<strong>" + count(res.output) + "</strong> chars · <strong>" +
@@ -119,6 +154,9 @@
         outEl.textContent = res.output || "";
         if (bannerEl && bannerElText(res, scope)) {
           bannerEl.classList.add("show");
+        }
+        if (!silent && res.output) {
+          showToast("✨ Converted text!");
         }
       }
       function bannerElText(res, sc) {
@@ -135,7 +173,7 @@
         return res.details.length >= 3 && false;
       }
 
-      if (swapBtn) swapBtn.addEventListener("click", function () {
+      function doSwap() {
         var d = direction;
         if (d === "hinglish-to-hindi") direction = "hindi-to-hinglish";
         else if (d === "hindi-to-hinglish") direction = "hinglish-to-hindi";
@@ -150,40 +188,67 @@
           o.setAttribute("aria-selected", o.getAttribute("data-direction") === direction ? "true" : "false");
         });
         updateLabels();
-      });
-      if (copyBtn) copyBtn.addEventListener("click", function () {
+        showToast("🔄 Swapped direction");
+      }
+
+      function doCopy() {
         var text = outEl.textContent || "";
         if (!text) return;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(function () {
-            var old = copyBtn.getAttribute("aria-label");
-            copyBtn.setAttribute("aria-label", "Copied");
-            setTimeout(function () { copyBtn.setAttribute("aria-label", old || "Copy"); }, 1200);
+            var old = copyBtn ? copyBtn.getAttribute("aria-label") : "";
+            if (copyBtn) copyBtn.setAttribute("aria-label", "Copied");
+            showToast("📋 Copied output!");
+            setTimeout(function () { if (copyBtn) copyBtn.setAttribute("aria-label", old || "Copy"); }, 1200);
           });
         }
-      });
-      if (clearBtn) clearBtn.addEventListener("click", function () {
+      }
+
+      function doClear() {
         inArea.value = "";
         outEl.textContent = "";
         if (placeholderEl) placeholderEl.style.display = "";
         if (statsEl) statsEl.innerHTML = "";
         if (bannerEl) bannerEl.classList.remove("show");
         if (convertBtn) convertBtn.disabled = true;
-      });
+        showToast("🧹 Cleared text");
+      }
+
+      if (swapBtn) swapBtn.addEventListener("click", doSwap);
+      if (copyBtn) copyBtn.addEventListener("click", doCopy);
+      if (clearBtn) clearBtn.addEventListener("click", doClear);
+
       if (inArea) {
         inArea.addEventListener("input", function () {
           if (convertBtn) convertBtn.disabled = !inArea.value.trim();
-          if (inArea.value.trim()) run(); else {
+          if (inArea.value.trim()) run(true); else {
             outEl.textContent = "";
             if (placeholderEl) placeholderEl.style.display = "";
             if (statsEl) statsEl.innerHTML = "";
           }
         });
-        if (inArea.value.trim()) run();
+        /* Keyboard shortcuts inside textarea */
+        inArea.addEventListener("keydown", function (e) {
+          if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            e.preventDefault();
+            run(false);
+          } else if (e.altKey && (e.key === "s" || e.key === "S")) {
+            e.preventDefault();
+            doSwap();
+          } else if (e.altKey && (e.key === "c" || e.key === "C")) {
+            e.preventDefault();
+            doCopy();
+          } else if (e.altKey && (e.key === "x" || e.key === "X")) {
+            e.preventDefault();
+            doClear();
+          }
+        });
+        if (inArea.value.trim()) run(true);
       }
+
       if (convertBtn) {
         convertBtn.disabled = !(inArea.value || "").trim();
-        convertBtn.addEventListener("click", run);
+        convertBtn.addEventListener("click", function () { run(false); });
       }
       updateLabels();
     });
