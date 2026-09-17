@@ -85,7 +85,7 @@
       var outEl = w.querySelector("[data-output]");
       var swapBtn = w.querySelector("[data-swap]");
       var copyBtn = w.querySelector("[data-copy]");
-      var clearBtn = w.querySelector("[data-clear]");
+      var clearBtns = w.querySelectorAll("[data-clear]");
       var convertBtn = w.querySelector("[data-convert]");
       var inLabel = w.querySelector("[data-label-in]");
       var outLabel = w.querySelector("[data-label-out]");
@@ -204,7 +204,7 @@
         }
       }
 
-      function doClear() {
+      function doClearAll() {
         inArea.value = "";
         outEl.textContent = "";
         if (placeholderEl) placeholderEl.style.display = "";
@@ -214,9 +214,29 @@
         showToast("🧹 Cleared text");
       }
 
+      function doClearInput() {
+        inArea.value = "";
+        outEl.textContent = "";
+        if (placeholderEl) placeholderEl.style.display = "";
+        if (statsEl) statsEl.innerHTML = "";
+        if (bannerEl) bannerEl.classList.remove("show");
+        if (convertBtn) convertBtn.disabled = true;
+        showToast("🧹 Input cleared");
+      }
+
+      function doClearOutput() {
+        outEl.textContent = "";
+        if (placeholderEl) placeholderEl.style.display = "";
+        if (statsEl) statsEl.innerHTML = "";
+        if (bannerEl) bannerEl.classList.remove("show");
+        showToast("🧹 Output cleared");
+      }
+
       if (swapBtn) swapBtn.addEventListener("click", doSwap);
       if (copyBtn) copyBtn.addEventListener("click", doCopy);
-      if (clearBtn) clearBtn.addEventListener("click", doClear);
+      Array.prototype.forEach.call(clearBtns, function (btn, idx) {
+        btn.addEventListener("click", idx === 0 ? doClearInput : doClearOutput);
+      });
 
       if (inArea) {
         inArea.addEventListener("input", function () {
@@ -240,7 +260,7 @@
             doCopy();
           } else if (e.altKey && (e.key === "x" || e.key === "X")) {
             e.preventDefault();
-            doClear();
+            doClearAll();
           }
         });
         if (inArea.value.trim()) run(true);
