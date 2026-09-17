@@ -171,20 +171,20 @@
           if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
           voiceActive = false;
           tbVoice.classList.remove("active");
-          tbVoice.innerHTML = '&#x1F3A4; Speak';
+          tbVoice.innerHTML = "&#x1F3A4; Speak";
           showToast("Mic stopped");
           return;
         }
         try {
           recognition = new SR();
-          recognition.lang = "hi-IN";
-          recognition.continuous = true;
+          recognition.lang = hinglishMode ? "hi-IN" : "en-US";
+          recognition.continuous = false;
           recognition.interimResults = true;
-          recognition.maxAlternatives = 3;
+          recognition.maxAlternatives = 1;
           recognition.onstart = function () {
             voiceActive = true;
             tbVoice.classList.add("active");
-            tbVoice.innerHTML = '&#x1F3A4; Listening...';
+            tbVoice.innerHTML = "&#x1F3A4; Listening...";
             showToast("Speak now — your device mic is active");
           };
           recognition.onresult = function (e) {
@@ -206,17 +206,12 @@
             else if (e.error !== "aborted") { showToast("Speech error: " + e.error); }
             voiceActive = false;
             tbVoice.classList.remove("active");
-            tbVoice.innerHTML = '&#x1F3A4; Speak';
+            tbVoice.innerHTML = "&#x1F3A4; Speak";
           };
           recognition.onend = function () {
-            if (voiceActive) {
-              /* Auto-restart for continuous dictation */
-              try { recognition.start(); } catch (e) {
-                voiceActive = false;
-                tbVoice.classList.remove("active");
-                tbVoice.innerHTML = '&#x1F3A4; Speak';
-              }
-            }
+            voiceActive = false;
+            tbVoice.classList.remove("active");
+            tbVoice.innerHTML = "&#x1F3A4; Speak";
           };
           recognition.start();
         } catch (e) {
@@ -226,6 +221,12 @@
 
       /* Emoji picker */
       var emojiPicker = null;
+      function closeEmojiPicker() {
+        if (emojiPicker) {
+          emojiPicker.style.display = "none";
+          tbEmoji.classList.remove("active");
+        }
+      }
       function buildEmojiPicker() {
         emojiPicker = document.createElement("div");
         emojiPicker.className = "emoji-popup";
@@ -247,6 +248,10 @@
             renderEmojiCat(tab.getAttribute("data-ecat"));
           });
         });
+        /* Prevent emoji popup from closing when clicking inside it */
+        emojiPicker.addEventListener("click", function (e) {
+          e.stopPropagation();
+        });
       }
       function renderEmojiCat(cat) {
         var grid = emojiPicker.querySelector("[data-emoji-grid]");
@@ -263,6 +268,7 @@
             inArea.value += this.textContent;
             inArea.dispatchEvent(new Event("input"));
             inArea.focus();
+            closeEmojiPicker();
           });
           grid.appendChild(btn);
         });
@@ -271,8 +277,18 @@
         e.stopPropagation();
         if (!emojiPicker) buildEmojiPicker();
         var isVisible = emojiPicker.style.display === "block";
-        emojiPicker.style.display = isVisible ? "none" : "block";
-        tbEmoji.classList.toggle("active", !isVisible);
+        if (isVisible) {
+          closeEmojiPicker();
+        } else {
+          emojiPicker.style.display = "block";
+          tbEmoji.classList.add("active");
+        }
+      });
+      /* Close emoji picker when clicking anywhere outside */
+      document.addEventListener("click", function (e) {
+        if (emojiPicker && emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && !tbEmoji.contains(e.target)) {
+          closeEmojiPicker();
+        }
       });
 
       /* On-screen keyboard */
